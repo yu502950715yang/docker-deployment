@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  redis:
+    image: redis:7.0.12
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./config:/usr/local/etc/redis
+      - ./data:/data
+    environment:
+      REDIS_PASSWORD: "123456"
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        if [ -z "$$REDIS_PASSWORD" ]; then
+          echo "ERROR: REDIS_PASSWORD must be set" >&2
+          exit 1
+        fi
+        exec redis-server /usr/local/etc/redis/redis.conf --requirepass "$$REDIS_PASSWORD"

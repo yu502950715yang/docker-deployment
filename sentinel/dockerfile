@@ -1,0 +1,38 @@
+# 使用官方的Java基础镜像作为父镜像
+FROM openjdk:8-jdk-alpine
+
+# 设置维护者信息
+LABEL maintainer="Eric"
+
+# 环境变量设置 SENTINEL_USER SENTINEL_PWD 为sentinel的用户名和密码，正式环境需要按照要求修改
+ENV SENTINEL_VERSION=1.8.8 \
+    APP_HOME=/opt/sentinel \
+    SENTINEL_USER=sentinel \
+    SENTINEL_PWD=8vdJ3Qzo@2
+
+# 更新系统并安装必要的软件包
+RUN apk update && apk upgrade && \
+    apk add --no-cache bash tzdata
+
+# 创建应用目录
+RUN mkdir -p $APP_HOME
+
+# 将本地的Sentinel jar包复制到容器中
+COPY sentinel-dashboard-${SENTINEL_VERSION}.jar ${APP_HOME}/sentinel-dashboard.jar
+
+# 创建启动脚本
+RUN echo '#!/bin/sh' > ${APP_HOME}/start.sh && \
+    echo 'java -Dserver.port=8081 -Dcsp.sentinel.dashboard.server=0.0.0.0:8081 -Dproject.name=sentinel-dashboard -Dsentinel.dashboard.auth.username=${SENTINEL_USER} -Dsentinel.dashboard.auth.password=${SENTINEL_PWD} -jar sentinel-dashboard.jar' >> ${APP_HOME}/start.sh && \
+    chmod +x ${APP_HOME}/start.sh
+
+# 设置工作目录
+WORKDIR $APP_HOME
+
+# 设置时区
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+# 容器启动时运行启动脚本
+CMD ["/bin/sh", "-c", "${APP_HOME}/start.sh"]
+
+# 暴露端口给宿主机
+EXPOSE 8081
