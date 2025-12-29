@@ -104,7 +104,7 @@ docker compose up -d
 ### Sentinel Dashboard
 路径：services/sentinel
 - 镜像基于 openjdk:8-jdk-alpine 构建，版本：1.8.8
-- Jar 包：sentinel-dashboard-1.8.8.jar（已随目录提供）
+- Jar 包：sentinel-dashboard-1.8.8.jar
 - 默认账户与密码可通过环境变量 SENTINEL_USER、SENTINEL_PWD 覆盖
 - 默认端口：8081
 
