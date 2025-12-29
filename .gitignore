@@ -1,5 +1,7 @@
 **/*.tar
 **/*.jar
 **/*.25-alpine
-n8n/data/
-n8n/postgres/
+services/n8n/data/
+services/n8n/postgres/
+services/redis/data/
+services/nginx/logs/

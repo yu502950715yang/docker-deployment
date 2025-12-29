@@ -1,0 +1,4 @@
+# 格式：docker save -o [保存路径/文件名.tar] [镜像名称]:[tag]
+docker save -o D:\docker_images\ubuntu20.04.tar ubuntu:20.04
+
+docker load -i D:\docker_images\ubuntu20.04.tar

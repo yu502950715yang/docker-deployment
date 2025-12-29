@@ -1,0 +1,85 @@
+# prometheus/prometheus.yml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# 告警规则文件
+rule_files:
+  - "alert_rules.yml"
+
+# 告警管理器配置
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# 抓取配置
+scrape_configs:
+  # 监控 Node Exporter (服务器指标)
+  - job_name: 'linux服务器'
+    static_configs:
+      - targets: ['192.168.52.130:9100']
+    scrape_interval: 30s
+  
+  - job_name: 'mysql服务器'
+    static_configs:
+      - targets: ['192.168.52.130:9100']
+    scrape_interval: 30s
+
+  # 监控 MySQL (根据你的需求添加)
+  - job_name: 'mysql'
+    static_configs:
+      - targets: ['mysql_exporter:9104']  # mysql_exporter安装服务器 IP
+    scrape_interval: 30s
+  
+  # 新增的Java JVM监控Job
+  - job_name: "jmx" # 不可修改grafana仪表盘写死的jmx
+    static_configs:
+      - targets: ["192.168.52.130:15058"]
+        labels:
+          instance: "app"
+      - targets: ["192.168.52.130:19200"]
+        labels:
+          instance: "auth"      
+      - targets: ["192.168.52.130:18888"]
+        labels:
+          instance: "device" 
+      - targets: ["192.168.52.130:19300"]
+        labels:
+          instance: "file"
+      - targets: ["192.168.52.130:18080"]
+        labels:
+          instance: "gateway"
+      - targets: ["192.168.52.130:19202"]
+        labels:
+          instance: "job"
+      - targets: ["192.168.52.130:19204"]
+        labels:
+          instance: "jufe"
+      - targets: ["192.168.52.130:19205"]
+        labels:
+          instance: "miniapp"
+      - targets: ["192.168.52.130:19408"]
+        labels:
+          instance: "patrol"
+      - targets: ["192.168.52.130:19201"]
+        labels:
+          instance: "system"
+      - targets: ["192.168.52.130:19999"]
+        labels:
+          instance: "camera"
+
+  - job_name: 'tomcat'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: 
+        - '192.168.1.80:19204'
+        - '192.168.1.80:19201'
+        - '192.168.1.80:18888'
+
+  # 监控 MySQL (使用 Telegraf 替代 MySQL Exporter)
+  # - job_name: 'mysql'
+  #   static_configs:
+  #     - targets: ['telegraf:8094']  # 改为 telegraf 服务的端口
+  #   scrape_interval: 30s

@@ -1,0 +1,5 @@
+Prometheus: http://localhost:9090
+
+Grafana: http://localhost:3000 (用户名: admin, 密码: admin123)
+
+需要修改各个配置文件中的配置

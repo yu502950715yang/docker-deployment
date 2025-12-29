@@ -1,0 +1,20 @@
+services:
+  sentinel:
+    # 构建上下文为当前目录
+    build:
+      context: .
+      dockerfile: dockerfile
+    # 指定镜像名称
+    image: sentinel-dashboard:1.8.8
+    # 容器名称
+    container_name: sentinel-dashboard
+    # 环境变量，与Dockerfile中的默认值保持一致，可在此覆盖
+    environment:
+      - TZ=Asia/Shanghai
+      - SENTINEL_USER=sentinel
+      - SENTINEL_PWD=8vdJ3Qzo@2
+    # 端口映射
+    ports:
+      - "8081:8081"
+    # 重启策略
+    restart: no

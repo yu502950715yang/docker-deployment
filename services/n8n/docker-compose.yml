@@ -1,0 +1,62 @@
+# n8n + PostgreSQL 部署（使用 Compose v2）
+# 将环境变量放入同目录的 .env 文件，避免把敏感信息写死
+services:
+  postgres:
+    # PostgreSQL 数据库：存储 n8n 的工作流、用户与凭据
+    image: postgres:15-alpine
+    container_name: n8n_postgres
+    # 数据库凭据（从 .env 读取）
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB:-n8n}
+    # 数据持久化：把容器数据目录映射到本地 ./postgres
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    # 健康检查：只有数据库就绪才会继续启动依赖服务
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # 禁用自动重启，需手动启动或重启容器
+    restart: "no"
+
+  n8n:
+    # n8n 主服务：自动化工作流引擎
+    image: n8nio/n8n:2.1.4
+    container_name: n8n
+    # 暴露 Web 控制台端口到宿主机
+    ports:
+      - "5678:5678"
+    # 依赖数据库，等待其健康检查通过后再启动
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # n8n 配置（多数来自 .env）
+    environment:
+      # 使用 Postgres 作为数据库
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB:-n8n}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      # 基本网络配置（生产环境建议使用反向代理与 HTTPS）
+      - N8N_HOST=${N8N_HOST:-localhost}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
+      - WEBHOOK_URL=${WEBHOOK_URL:-http://localhost:5678/}
+      - N8N_DEFAULT_LOCALE=${N8N_DEFAULT_LOCALE:-zh-CN}
+      - N8N_SECURE_COOKIE=${N8N_SECURE_COOKIE:-false}
+      # 加密凭据用的密钥（务必设置强随机值）
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      # 时区设置
+      - GENERIC_TIMEZONE=${TZ:-Asia/Shanghai}
+    # 持久化 n8n 应用数据（如工作流、设置等）
+    volumes:
+      - ./data:/home/node/.n8n
+      # 汉化：挂载汉化包到 n8n 容器
+      - ./language/zh/dist:/usr/local/lib/node_modules/n8n/node_modules/n8n-editor-ui/dist
+    # 禁用自动重启，需手动启动或重启容器
+    restart: "no"

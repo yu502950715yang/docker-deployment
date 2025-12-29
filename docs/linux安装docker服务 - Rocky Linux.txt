@@ -1,0 +1,31 @@
+更新系统软件包
+sudo dnf update -y
+
+安装必备工具
+sudo dnf install -y yum-utils device-mapper-persistent-data lvm2
+
+配置国内镜像仓库
+sudo yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+安装Docker引擎
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+启动并设置开机自启
+sudo systemctl enable docker --now
+
+允许非root用户执行Docker命令
+sudo usermod -aG docker $USER
+
+重启Docker服务
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+安装docker compose
+sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo dnf install docker-compose-plugin
+sudo dnf install docker-compose-plugin
+
+配置防火墙（如果启用）
+如果你的系统防火墙（firewalld）是开启状态，需要放行Docker容器使用的端口。例如，要放行80端口供Nginx容器使用：
+sudo firewall-cmd --permanent --add-port=80/tcp
+sudo firewall-cmd --reload

@@ -1,7 +1,0 @@
-启动
-docker-compose up -d
-停止
-docker-compose stop
-
-将本地tar包添加到本地镜像
-docker load -i openjdk-8-jdk-alpine.tar
