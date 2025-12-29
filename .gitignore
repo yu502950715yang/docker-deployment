@@ -1,4 +1,5 @@
 **/*.tar
+**/*.jar
 **/*.25-alpine
 n8n/data/
 n8n/postgres/
