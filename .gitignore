@@ -5,3 +5,4 @@ services/n8n/data/
 services/n8n/postgres/
 services/redis/data/
 services/nginx/logs/
+volumes/
