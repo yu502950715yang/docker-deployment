@@ -1,0 +1,29 @@
+FROM openjdk:8-jdk-alpine
+
+# 安装 dos2unix 用于修复脚本格式问题
+RUN apk add --no-cache dos2unix
+
+ADD distribution-*-bundle-tar.tar.gz /opt/im-server/
+
+# 修复脚本文件的换行符格式
+RUN dos2unix /opt/im-server/bin/wildfirechat.sh
+
+RUN sed -i 's/#JAVA_OPTS="$JAVA_OPTS -Xmx128M"/JAVA_OPTS="$JAVA_OPTS -Xmx$JVM_XMX"/g' /opt/im-server/bin/wildfirechat.sh
+RUN sed -i 's/#JAVA_OPTS="$JAVA_OPTS -Xms128M"/JAVA_OPTS="$JAVA_OPTS -Xms$JVM_XMS"/g' /opt/im-server/bin/wildfirechat.sh
+
+RUN chmod a+x /opt/im-server/bin/wildfirechat.sh
+
+WORKDIR /opt/im-server
+
+VOLUME /opt/im-server/config
+VOLUME /opt/im-server/logs
+VOLUME /opt/im-server/h2db
+VOLUME /opt/im-server/media
+
+EXPOSE 80/tcp 1883/tcp 8083/tcp 8084/tcp 18080/tcp
+
+ENV JVM_XMX 256M
+ENV JVM_XMS 256M
+
+
+CMD ./bin/wildfirechat.sh

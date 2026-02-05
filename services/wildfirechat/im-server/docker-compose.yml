@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  im-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: im-server:latest
+    container_name: im-server
+    ports:
+      - "80:80"        # HTTP 短连接端口
+      - "1883:1883"    # MQTT 长连接端口
+      - "8083:8083"    # WebSocket 端口 (如果有)
+      - "8084:8084"    # WebSocket SSL 端口 (如果有)
+      - "18080:18080"  # 管理后台端口
+    volumes:
+      # 挂载配置文件，这样你可以直接在宿主机修改配置
+      - ./config:/opt/im-server/config
+      # 挂载日志目录
+      - ./data/logs:/opt/im-server/logs
+      # 挂载 H2 数据库目录 (如果使用 MySQL，这个可以去掉，但需修改配置)
+      - ./data/h2db:/opt/im-server/h2db
+      # 挂载媒体文件目录 (图片、语音等)
+      - ./data/media:/opt/im-server/media
+    environment:
+      - JVM_XMX=512M
+      - JVM_XMS=256M
+      # 时区设置，确保日志时间正确
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
