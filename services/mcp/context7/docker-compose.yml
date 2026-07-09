@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  context7-mcp:
+    image: context7-mcp-service:latest # 使用你构建的Context7 MCP服务镜像
+    container_name: context7-mcp-service
+    ports:
+      - "3000:3000" # Context7 MCP服务默认监听端口
+    environment:
+      - CONTEXT7_API_KEY=sk-1234567890abcdef1234567890abcdef # 替换为你的实际API密钥
+    volumes:
+      # 如果你的服务需要持久化数据或挂载配置文件，可以在这里添加
+      # - ./data:/app/data
+    restart: always
+    # 根据需要添加其他配置，例如网络、依赖等
