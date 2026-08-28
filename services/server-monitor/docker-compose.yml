@@ -1,0 +1,28 @@
+# =============================================================
+# docker-compose.yml
+# 用途：在本机部署 node-exporter，采集服务器状态指标
+#       （CPU/内存/磁盘/网络/进程等），供远端 Prometheus 抓取。
+# 使用：docker compose up -d
+# 验证：curl http://<本机IP>:9100/metrics
+# 远端 Prometheus 抓取地址：<本机IP>:9100
+# =============================================================
+
+services:
+  node-exporter:
+    image: prom/node-exporter:v1.9.1
+    container_name: node_exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"          # 对外暴露指标端口，供远端 Prometheus 抓取
+    pid: host                # 共享宿主机 PID 命名空间，才能采集到真实进程指标
+    volumes:
+      # 挂载宿主机文件系统，node-exporter 采集到的是宿主机真实状态
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      # 排除噪音挂载点，避免产生大量无意义的时序数据
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
