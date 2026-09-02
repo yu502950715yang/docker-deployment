@@ -83,3 +83,9 @@ scrape_configs:
   #   static_configs:
   #     - targets: ['telegraf:8094']  # 改为 telegraf 服务的端口
   #   scrape_interval: 30s
+
+  # 监控 GPU (DCGM Exporter，部署在 GPU 服务器 10.0.2.170:9400)
+  - job_name: 'gpu'
+    static_configs:
+      - targets: ['10.0.2.170:9400']
+    scrape_interval: 15s

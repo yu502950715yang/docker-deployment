@@ -8,6 +8,7 @@
 - services/mysql5.7：MySQL 5.7，支持初始化脚本挂载
 - services/n8n：n8n 自动化平台 + PostgreSQL，支持中文界面汉化
 - services/monitoring：Prometheus、Grafana、Node Exporter、MySQL Exporter 组合
+- services/gpu-monitor：NVIDIA GPU 监控（DCGM Exporter），配套监控栈的 Prometheus 抓取与官方面板
 - services/sentinel：Sentinel Dashboard 1.8.8 的镜像构建与运行
 - docs：与 Docker 安装和常用命令相关的参考资料
 
@@ -100,6 +101,24 @@ docker compose up -d
 访问：
 - Prometheus：http://localhost:9090/
 - Grafana：http://localhost:3000/
+
+### NVIDIA GPU 监控（DCGM Exporter）
+路径：services/gpu-monitor（部署在带 NVIDIA GPU 的服务器上）
+- 前提：GPU 服务器需安装 NVIDIA 驱动与 NVIDIA Container Toolkit（详见该目录 README）
+- 默认端口：DCGM Exporter → 9400
+- 计数器文件：dcgm-exporter-counters.csv（在官方基础上补充了风扇转速、ECC 等字段）
+- 配套改动（在监控栈主机上）：
+  - prometheus/prometheus.yml 已添加 `gpu` 抓取 job（target `10.0.2.170:9400`，请按实际 IP 修改）
+  - grafana/provisioning/dashboards 已预置 NVIDIA 官方面板（id 12239）
+- 可选：gpu-process-monitor.sh 用于监控"哪些进程在使用 GPU"（node-exporter textfile collector 方案）
+
+启动（在 GPU 服务器上）：
+
+```bash
+cd services/gpu-monitor
+docker compose up -d
+curl http://<本机IP>:9400/metrics | grep DCGM_FI_DEV_GPU_UTIL
+```
 
 ### Sentinel Dashboard
 路径：services/sentinel

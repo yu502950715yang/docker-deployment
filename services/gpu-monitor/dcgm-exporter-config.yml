@@ -1,0 +1,15 @@
+# =============================================================
+# dcgm-exporter-config.yml
+# DCGM Exporter 的 YAML 启动配置（通过 --config-file 加载）。
+# 说明：
+#   - metrics.file：指定计数器文件（绝对路径，容器内已挂载）
+#   - collection.interval：指标采集间隔
+# 参考：https://docs.nvidia.com/datacenter/cloud-native/gpu-telemetry/dcgm-exporter.html
+# =============================================================
+version: 1
+
+metrics:
+  file: /etc/dcgm-exporter/custom-counters.csv
+
+collection:
+  interval: 10s

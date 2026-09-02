@@ -1,0 +1,39 @@
+# =============================================================
+# docker-compose.yml
+# 用途：在带 NVIDIA GPU 的 Linux 服务器上部署 DCGM Exporter，
+#       对外暴露 GPU 指标（利用率/显存/温度/功耗/风扇转速等），
+#       供远端 Prometheus 抓取。
+#
+# 前置条件（必须在 GPU 服务器上完成，见 README.md）：
+#   1. 已安装 NVIDIA 驱动（NVIDIA Driver）
+#   2. 已安装 NVIDIA Container Toolkit（docker 才能使用 GPU）
+#
+# 使用：docker compose up -d
+# 验证：curl http://<本机IP>:9400/metrics
+# 远端 Prometheus 抓取地址：<本机IP>:9400
+# =============================================================
+
+services:
+  dcgm-exporter:
+    image: nvcr.io/nvidia/k8s/dcgm-exporter:4.6.0-4.8.3-distroless
+    container_name: dcgm_exporter
+    restart: unless-stopped
+    ports:
+      - "9400:9400"            # 对外暴露指标端口，供远端 Prometheus 抓取
+    # 启用 GPU 访问（等价于 docker run --gpus all）
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    cap_add:
+      - SYS_ADMIN              # DCGM 访问 GPU 所需
+    volumes:
+      # 自定义计数器文件：在默认指标基础上补充风扇转速等字段
+      - ./dcgm-exporter-counters.csv:/etc/dcgm-exporter/custom-counters.csv:ro
+      # YAML 启动配置：指定计数器文件与采集间隔
+      - ./dcgm-exporter-config.yml:/etc/dcgm-exporter/dcgm-exporter-config.yml:ro
+    command:
+      - '--config-file=/etc/dcgm-exporter/dcgm-exporter-config.yml'
