@@ -3,6 +3,12 @@ services:
   context7-mcp:
     image: context7-mcp-service:latest # 使用你构建的Context7 MCP服务镜像
     container_name: context7-mcp-service
+    # 限制容器日志大小并自动轮转，避免占满磁盘
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "3000:3000" # Context7 MCP服务默认监听端口
     environment:

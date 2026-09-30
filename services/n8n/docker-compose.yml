@@ -5,6 +5,12 @@ services:
     # PostgreSQL 数据库：存储 n8n 的工作流、用户与凭据
     image: postgres:15-alpine
     container_name: n8n_postgres
+    # 限制容器日志大小并自动轮转，避免占满磁盘
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     # 数据库凭据（从 .env 读取）
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
@@ -26,6 +32,12 @@ services:
     # n8n 主服务：自动化工作流引擎
     image: n8nio/n8n:2.1.4
     container_name: n8n
+    # 限制容器日志大小并自动轮转，避免占满磁盘
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     # 暴露 Web 控制台端口到宿主机
     ports:
       - "5678:5678"

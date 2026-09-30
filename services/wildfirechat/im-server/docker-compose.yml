@@ -7,6 +7,12 @@ services:
       dockerfile: Dockerfile
     image: im-server:latest
     container_name: im-server
+    # 限制容器日志大小并自动轮转，避免占满磁盘
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "80:80"        # HTTP 短连接端口
       - "1883:1883"    # MQTT 长连接端口

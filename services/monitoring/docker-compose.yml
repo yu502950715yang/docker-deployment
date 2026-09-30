@@ -5,6 +5,12 @@ services:
   prometheus:
     image: prom/prometheus:v3.6.0
     container_name: prometheus
+    # 限制容器日志大小并自动轮转，避免占满磁盘
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
     ports:
       - "9090:9090"
@@ -27,6 +33,12 @@ services:
   grafana:
     image: grafana/grafana:12.3.0-18392635519
     container_name: grafana
+    # 限制容器日志大小并自动轮转，避免占满磁盘
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -47,6 +59,12 @@ services:
   node-exporter:
     image: prom/node-exporter:v1.9.1
     container_name: node_exporter
+    # 限制容器日志大小并自动轮转，避免占满磁盘
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
     ports:
       - "9100:9100"
@@ -65,6 +83,12 @@ services:
   mysql-exporter:
     image: prom/mysqld-exporter:v0.18.0
     container_name: mysql_exporter
+    # 限制容器日志大小并自动轮转，避免占满磁盘
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
     ports:
       - "9104:9104"

@@ -17,6 +17,12 @@ services:
   dcgm-exporter:
     image: nvcr.io/nvidia/k8s/dcgm-exporter:4.6.0-4.8.3-distroless
     container_name: dcgm_exporter
+    # 限制容器日志大小并自动轮转，避免占满磁盘
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
     ports:
       - "9400:9400"            # 对外暴露指标端口，供远端 Prometheus 抓取
